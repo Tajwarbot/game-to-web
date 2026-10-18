@@ -1,54 +1,71 @@
 # webport-unity-game
 
-An Agent Skill for **porting a Unity-class desktop game to run in a web browser**
-(a "webport").
+An agent skill for making the call most ports get wrong: *can this game actually run in a browser?* — and only then building it.
 
-It drives any coding agent (Claude Code, Codex, opencode, and others that read the
-Agent Skills format) through a **research-first, gated** workflow:
+Combining a desktop game with a web page is not a build flag. It is a series of judgement calls about engines, middleware, transports, and the hard limits of a browser tab. Most webports fail at the first call, not at the last compile. This skill keeps an AI coding agent honest about that order: establish the facts, decide, then build.
 
-1. **Intake** — collect what the user actually has and wants.
-2. **Heavy research** — identify the engine, scripting backend, middleware,
-   rendering, assets, UI, saves, and native-only systems → a Research Dossier.
-3. **Feasibility verdict** — go / no-go with blockers and mitigations.
-4. **Approach selection** — pick the best method for *that* game (Unity WebGL
-   export, WASM rebuild, hybrid, pixel streaming, partial rewrite).
-5. **Execution plan** — build pipeline, asset delivery, networking, auth, input,
-   audio/voice, saves, testing, release.
-6. **Build / test / ship loop** — with the traps already documented.
+---
 
-Every phase ends in a **checkpoint**: the agent shows an artifact and asks the
-user before continuing.
+## What it does
+
+The skill installs a workflow, not a script. It drives the agent through six phases, and every phase ends at a checkpoint where the agent states what it found and waits for you to agree before spending hours building.
+
+**Intake.** Establish what you actually have — an installer, a Steam copy, a reconstructed project, or real source — and what must survive the port: multiplayer, voice, controller input, saves, mods. Nothing is assumed.
+
+**Reconnaissance.** Identify the engine and scripting backend, then the middleware that decides the whole job: the networking SDK, voice, audio codecs, input system, DRM, anti-cheat, native plugins, and the UI and save systems. Each finding is backed by where it was seen, so the next phase rests on evidence rather than a guess.
+
+**Feasibility.** Classify the game — direct port, direct port with substitutions, hybrid, rewrite, or not client-side at all — and produce a go/no-go with a named blocker and a mitigation for each. A wrong call here is the most expensive mistake in the process, so the skill refuses to skip it.
+
+**Approach.** Choose one method and justify it against its closest rival. Rebuild to WebGL, compile to WebAssembly, wrap an existing build, stream pixels from a server, or reimplement the shell in HTML — the right answer depends on this game, not on the last one.
+
+**Plan.** A concrete execution plan covering the build pipeline, asset delivery and caching, networking, authentication, input, audio and voice, saves, testing, and release.
+
+**Build, test, ship.** A loop, not a big bang: build, regenerate the served page, serve locally, drive it with an automated browser, test with two clients, deploy, and re-test hosted — with the traps that already cost time documented up front.
+
+---
 
 ## Install
-
-Copy this folder into your agent's skills directory, or use the skills CLI:
 
 ```bash
 npx skills add Tajwarbot/webport-unity-game
 ```
 
-Common auto-loaded locations:
+Or drop the folder into any agent that reads the Agent Skills format:
 
-- `~/.agents/skills/webport-unity-game/`
-- `~/.claude/skills/webport-unity-game/`
-- `.opencode/skills/webport-unity-game/`
+```
+~/.agents/skills/webport-unity-game/
+~/.claude/skills/webport-unity-game/
+.opencode/skills/webport-unity-game/
+```
+
+Then ask, in plain language:
+
+> Can this game run in a browser? Here's the install folder — research it and tell me what porting it would take.
+
+---
 
 ## Contents
 
-- `SKILL.md` — the workflow and gates.
-- `references/01-recon-and-research.md` — identify engine + middleware; dossier template.
-- `references/02-feasibility-and-approach.md` — decision classes, scoring, red flags, approaches.
-- `references/03-unity-webgl-port-playbook.md` — the concrete Unity build/port mechanics.
-- `references/04-browser-platform-playbook.md` — networking, hosting, auth, audio, input, saves, testing.
-- `references/05-hard-won-lessons.md` — traps that cost real time on a real port.
-- `references/06-worked-example-repo.md` — a completed port as a reference (no identifiers).
+| File | Purpose |
+| --- | --- |
+| `SKILL.md` | The six-phase workflow and its checkpoints. |
+| `references/01-recon-and-research.md` | Where to look to identify the engine and middleware; the dossier template. |
+| `references/02-feasibility-and-approach.md` | Decision classes, a scoring checklist, red flags, and the five approaches. |
+| `references/03-unity-webgl-port-playbook.md` | The concrete Unity pipeline: reconstruction, export, the served-page trap, and the JS bridge. |
+| `references/04-browser-platform-playbook.md` | Networking, hosting, auth, audio, input, saves, and test automation. |
+| `references/05-hard-won-lessons.md` | Failures that cost real time on a real port, stated as checks. |
+| `references/06-worked-example-repo.md` | A completed port used as a reference shape. No identifiers. |
 
-## Scope and honesty
+---
 
-- This is guidance, not magic. It will not make an unportable game port.
-- Browser limits are real: no raw sockets, software rendering, memory ceiling, no
-  OS/Steam APIs.
-- You must own or be licensed to the game you port; do not redistribute
-  proprietary assets or defeat DRM.
-- The worked example is deliberately free of any real AppIds, passwords, or
-  endpoints.
+## What it will not do
+
+It will not make an unportable game port, and it will not pretend otherwise. Browsers have real ceilings: no raw sockets, software rendering, a memory cap, and no access to Steam or the operating system. Kernel-level anti-cheat and always-online DRM frequently rule a client-side port out entirely, leaving only a streamed remote build.
+
+It also assumes you own or are licensed to the game. The skill does not defeat DRM and does not ship proprietary assets.
+
+---
+
+## Provenance
+
+The checklists, the traps, and the playbooks come from a completed port of a Unity IL2CPP co-op game to a live, password-gated web build — including the multiplayer, voice, and delivery work that made it playable. The worked example is written without any real AppIds, endpoints, or credentials.
