@@ -39,6 +39,8 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | 4-5 (browser platform) | `references/04-browser-platform-playbook.md` |
 | 2-4 (large games) | `references/07-large-game-streaming.md` |
 | 3-5 (non-Unity / custom engine) | `references/08-native-wasm-port-playbook.md` |
+| 4 (planning) | `references/10-plan-template.md` |
+| all (sources) | `references/09-sources.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
 
@@ -147,19 +149,29 @@ State the chosen approach, why, its cost, and its main failure mode. Ask the use
 
 ## Phase 4 - Execution plan (gate)
 
-Only after approval. Produce a concrete plan covering, at minimum: build pipeline,
-asset delivery + caching, networking transport, authentication, input, audio/voice,
-saves, testing harnesses, and release/versioning. Use:
+Only after approval. Before writing the plan, run a **dead-end pre-mortem**:
+list the five most likely ways this port fails and the cheapest test that would
+reveal each. Then build the plan from `references/10-plan-template.md`.
+
+**Ground every workstream.** For each one, name the reference used and the known
+failure it avoids, drawn from `references/05-hard-won-lessons.md` and
+`references/06-worked-example-repo.md`. If you cannot name the failure mode, you
+have not researched that workstream enough.
+
+Cover at minimum: build pipeline, asset delivery + caching, networking transport,
+authentication, input, audio/voice, saves, testing harnesses, and release.
+Use:
 
 - `references/03-unity-webgl-port-playbook.md` for the Unity build/port mechanics.
 - `references/04-browser-platform-playbook.md` for networking, hosting, auth,
   audio, input, saves, and testing.
 - `references/07-large-game-streaming.md` when the assets exceed the memory
   budget: chunked download, an OPFS cache, and eviction.
+- `references/09-sources.md` for official docs behind any claim.
 
-Present the plan. If it contains real alternatives (delivery, auth, transport),
-offer them as options with a recommendation too. Then ask whether to start
-executing.
+Present the plan, including the pre-mortem and the definition of done. If it
+contains real alternatives (delivery, auth, transport), offer them as options
+with a recommendation too. Then ask whether to start executing.
 
 ## Phase 5 - Build / test / ship loop
 
@@ -172,6 +184,8 @@ Run the loop, not one big bang:
 4. Run single-client and multi-client functional tests.
 5. Deploy to staging/hosted; re-run the same tests hosted.
 6. Package a release; keep a versioned, reproducible artifact.
+7. Check the work against the **definition of done** in
+   `references/10-plan-template.md` before calling it finished.
 
 Record every "worked / didn't work" result in a running `STATE.md`, and keep a
 `HANDOFF-*.md` that a successor agent can act on without re-discovering anything.

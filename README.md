@@ -70,6 +70,8 @@ The value is in the specifics that real ports take time to learn:
 | `references/06-worked-example-repo.md` | A completed port used as a reference shape. No identifiers. |
 | `references/07-large-game-streaming.md` | Streamed installs: chunked download, OPFS cache, eviction and wasm memory limits, with a playgta5.net case study. |
 | `references/08-native-wasm-port-playbook.md` | The native path: Emscripten, WASMFS, the streaming filesystem, emulator targets, and the C&C Generals and LEGO Racers case studies. |
+| `references/09-sources.md` | Official docs and case studies behind the claims in this skill. |
+| `references/10-plan-template.md` | A fill-in plan, the dead-end pre-mortem, and the definition of done. |
 | `examples/example-session.md` | A condensed example of the output at each checkpoint. |
 
 ## Limits
