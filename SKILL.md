@@ -37,6 +37,7 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | 2–3 | `references/02-feasibility-and-approach.md` |
 | 4–5 (Unity) | `references/03-unity-webgl-port-playbook.md` |
 | 4–5 (browser platform) | `references/04-browser-platform-playbook.md` |
+| 2–4 (large games) | `references/07-large-game-streaming.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
 
@@ -52,7 +53,9 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
   - No raw UDP/TCP sockets. Networking is WebSocket (TCP) or WebRTC only.
   - WebGL runs on a single (or limited) thread; software rendering (SwiftShader)
     is slow — always benchmark, never assume.
-  - Memory ceiling is roughly 2–4 GB (browser/tab dependent).
+  - Memory ceiling: wasm32 tops out at 4 GB (Unity's default heap is 2 GB);
+    wasm64 reaches 16 GB but not on Safari. Anything larger than the working set
+    must be **streamed and evicted**, never held resident.
   - No OS APIs: no Steam, no filesystem, no native dialogs, no background threads
     as on desktop.
 
@@ -102,6 +105,10 @@ Read `references/02-feasibility-and-approach.md`. Classify the game and score it
 - **E — Not feasible (cloud streaming only)**: cannot run client-side; only a
   pixel-streamed remote build is realistic.
 
+For an asset-heavy game, also decide here whether a **streamed install** is
+required — a big game cannot fit in memory and must be chunk-streamed and cached
+(see `references/07-large-game-streaming.md`).
+
 Give a **go / no-go**, the blockers, and a mitigation for each blocker. For a
 "yes", state the residual risk. Then ask the user to accept or reject the verdict.
 
@@ -127,6 +134,8 @@ saves, testing harnesses, and release/versioning. Use:
 - `references/03-unity-webgl-port-playbook.md` for the Unity build/port mechanics.
 - `references/04-browser-platform-playbook.md` for networking, hosting, auth,
   audio, input, saves, and testing.
+- `references/07-large-game-streaming.md` when the assets exceed the memory
+  budget: chunked download, an OPFS cache, and eviction.
 
 Present the plan, then ask the user whether to start executing.
 

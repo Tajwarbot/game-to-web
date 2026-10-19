@@ -18,7 +18,7 @@ The skill installs a workflow, not a script. It drives the agent through six pha
 
 **Approach.** Choose one method and justify it against its closest rival. Rebuild to WebGL, compile to WebAssembly, wrap an existing build, stream pixels from a server, or reimplement the shell in HTML — the right answer depends on this game, not on the last one.
 
-**Plan.** A concrete execution plan covering the build pipeline, asset delivery and caching, networking, authentication, input, audio and voice, saves, testing, and release.
+**Plan.** A concrete execution plan covering the build pipeline, asset delivery and caching, networking, authentication, input, audio and voice, saves, testing, and release. For an asset-heavy game it plans a **streamed install** — a small bootstrap plus chunked, range-fetched content in an OPFS cache with LRU eviction — instead of a full download.
 
 **Build, test, ship.** A loop, not a big bang: build, regenerate the served page, serve locally, drive it with an automated browser, test with two clients, deploy, and re-test hosted — with the traps that already cost time documented up front.
 
@@ -55,6 +55,7 @@ Then ask, in plain language:
 | `references/04-browser-platform-playbook.md` | Networking, hosting, auth, audio, input, saves, and test automation. |
 | `references/05-hard-won-lessons.md` | Failures that cost real time on a real port, stated as checks. |
 | `references/06-worked-example-repo.md` | A completed port used as a reference shape. No identifiers. |
+| `references/07-large-game-streaming.md` | Streamed installs: chunked download, OPFS cache, eviction, and wasm memory limits. Includes a playgta5.net case study. |
 
 ---
 
