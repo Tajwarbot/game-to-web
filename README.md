@@ -1,6 +1,6 @@
-# webport
+# Game to Web (G2W)
 
-A reusable agent skill for porting desktop games to the browser.
+G2W (Game to Web) is a reusable agent skill for porting desktop games to the browser.
 
 It works with Claude Code, Codex, opencode and any agent that reads the Agent Skills format. Point it at a game and it researches the build, decides what kind of port is realistic, lays out the options with a recommendation, and only starts work after you approve.
 
@@ -9,7 +9,7 @@ It works with Claude Code, Codex, opencode and any agent that reads the Agent Sk
 
 ## The problem
 
-Failed game ports usually die at the first decision, not the last compile. The engine version, the middleware, the network model and the browser's limits decide the outcome long before a build runs. webport makes the agent settle those questions in order, with evidence, and stop for your approval before it spends hours.
+Failed game ports usually die at the first decision, not the last compile. The engine version, the middleware, the network model and the browser's limits decide the outcome long before a build runs. G2W makes the agent settle those questions in order, with evidence, and stop for your approval before it spends hours.
 
 ## How it works
 
@@ -37,7 +37,7 @@ flowchart LR
 ## Quick start
 
 ```bash
-npx skills add Tajwarbot/webport
+npx skills add Tajwarbot/game-to-web
 ```
 
 Then ask:

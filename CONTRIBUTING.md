@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for improving webport.
+Thanks for improving G2W.
 
 ## What fits
 

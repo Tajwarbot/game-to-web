@@ -1,12 +1,12 @@
 ---
-name: webport
+name: game-to-web
 description: Research, feasibility-assess, and port a desktop game (Unity or native) to run in a web browser ("webport"). Use when the user wants to bring a game to the browser, asks "can this game run in a browser", mentions WebGL/WebGPU ports, Emscripten, AssetRipper, decompiling a Unity build, Unity WebGL, browser multiplayer (Photon/PUN), or publishing a playable web build. Also use to scope or estimate a webport before committing, and for the ongoing build/test/deploy loop of an existing webport.
 metadata:
   version: "1"
-  purpose: one-shot-to-plan webport workflow for any coding agent
+  purpose: one-shot-to-plan G2W (Game to Web) workflow for any coding agent
 ---
 
-# Webport a desktop game to the browser
+# G2W: port a desktop game to the browser
 
 Porting a native/desktop game to a playable web page is a **research-first, gated**
 process. Do not write code, run a build engine, or start decompiling until the
