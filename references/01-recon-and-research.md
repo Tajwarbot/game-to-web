@@ -29,7 +29,7 @@ facts. Never guess the engine or middleware.
 
 - **AssetRipper** (or similar) turns a build's assets into a Unity project
   (`ExportedProject/` with `Assets/`, `ProjectSettings/`). Scripts come back as
-  **stubbed C#** that must be filled in — plan for this.
+  **stubbed C#** that must be filled in - plan for this.
 - **IL2CPP** builds: recover metadata and structure, then re-express scripts.
   Expect the logic to be imperfect; the aim is a **compiling** project that
   behaves like the original for the scope you agreed.

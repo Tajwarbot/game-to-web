@@ -34,17 +34,17 @@ pattern that a stock Unity build cannot.
 
 ## The streaming filesystem (the core of this path)
 
-- **WASMFS fetch backend** — file reads become **HTTP Range** requests (default
+- **WASMFS fetch backend** - file reads become **HTTP Range** requests (default
   16 MiB chunks); requires a worker thread.
-- **OPFS backend** — downloaded bytes persist in the Origin Private File System.
-- **`FS.createLazyFile()`** — a file loads on first access (worker-only).
-- **`WORKERFS`** — mount a user-supplied `File`/`Blob` without copying it all
+- **OPFS backend** - downloaded bytes persist in the Origin Private File System.
+- **`FS.createLazyFile()`** - a file loads on first access (worker-only).
+- **`WORKERFS`** - mount a user-supplied `File`/`Blob` without copying it all
   into memory; ideal for "bring your own assets".
-- **`IDBFS`** — IndexedDB-backed persistence for **saves/config**, synced with
+- **`IDBFS`** - IndexedDB-backed persistence for **saves/config**, synced with
   `FS.syncfs()`.
 
 The production pattern is a **custom lower FS backend**: read/write go through a
-chunk cache — manifest → chunk IDs → OPFS hit or HTTP-Range fetch → verify →
+chunk cache - manifest → chunk IDs → OPFS hit or HTTP-Range fetch → verify →
 write → LRU evict. That is genuine demand paging, and it is what makes a
 tens-of-GB game run in a browser tab.
 
@@ -59,15 +59,15 @@ tens-of-GB game run in a browser tab.
 | Warzone 2100 / OpenTTD / Diablo Web | Emscripten / WebGL2 | async streaming, on-demand video, IndexedDB saves, user-supplied assets |
 
 These assets are proprietary. Open-source engine code is **not** a licence to ship
-the game's content — see the legal note in `05-hard-won-lessons.md`.
+the game's content - see the legal note in `05-hard-won-lessons.md`.
 
 ## Emulator path (no source, no port)
 
 When there is no source and no port, emulate the original in the browser:
 
-- **EmulatorJS / RetroArch (libretro cores)** — consoles; MEMFS for ROMs, IDBFS
+- **EmulatorJS / RetroArch (libretro cores)** - consoles; MEMFS for ROMs, IDBFS
   for saves; some cores require threads + COOP/COEP.
-- **js-dos / DOSBox-X** — DOS/Windows 9x; **Sockdrive** streams large FAT disk
+- **js-dos / DOSBox-X** - DOS/Windows 9x; **Sockdrive** streams large FAT disk
   images on demand instead of downloading the whole image.
 - Practical ceiling: PS1/N64/PSP/DOS are viable; PS2/GameCube/Xbox/3DS generally
   are not.
@@ -90,7 +90,7 @@ When there is no source and no port, emulate the original in the browser:
   shader stutter on first run.
 - `AudioContext` needs a user gesture.
 - wasm32's **4 GB** limit means stream; do not try to load the world.
-- OPFS sync handles are worker-only and exclusive — elect one downloader tab with
+- OPFS sync handles are worker-only and exclusive - elect one downloader tab with
   the **Web Locks API**.
 - Keep saves out of the disposable cache (eviction is all-or-nothing per origin).
 

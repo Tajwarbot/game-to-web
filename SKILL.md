@@ -1,5 +1,5 @@
 ---
-name: webport-game
+name: webport
 description: Research, feasibility-assess, and port a desktop game (Unity or native) to run in a web browser ("webport"). Use when the user wants to bring a game to the browser, asks "can this game run in a browser", mentions WebGL/WebGPU ports, Emscripten, AssetRipper, decompiling a Unity build, Unity WebGL, browser multiplayer (Photon/PUN), or publishing a playable web build. Also use to scope or estimate a webport before committing, and for the ongoing build/test/deploy loop of an existing webport.
 metadata:
   version: "1"
@@ -22,23 +22,23 @@ Work the phases in order. Each phase ends in a **gate**: a short artifact you
 show the user, followed by an explicit question. **Stop and wait for the answer.**
 Never skip ahead to building because it "seems obvious".
 
-- Phase 0 — Intake (ask, collect, confirm scope)
-- Phase 1 — Heavy research (no code) → **Research Dossier**
-- Phase 2 — Feasibility verdict → **go / no-go** (gate)
-- Phase 3 — Approach selection → **chosen method** (gate)
-- Phase 4 — Execution plan → **plan** (gate)
-- Phase 5 — Build / test / ship loop
+- Phase 0 - Intake (ask, collect, confirm scope)
+- Phase 1 - Heavy research (no code) → **Research Dossier**
+- Phase 2 - Feasibility verdict → **go / no-go** (gate)
+- Phase 3 - Approach selection → **chosen method** (gate)
+- Phase 4 - Execution plan → **plan** (gate)
+- Phase 5 - Build / test / ship loop
 
 Detail lives in `references/` (read the relevant one when you reach that phase):
 
 | Phase | Reference |
 |---|---|
 | 1 | `references/01-recon-and-research.md` |
-| 2–3 | `references/02-feasibility-and-approach.md` |
-| 4–5 (Unity) | `references/03-unity-webgl-port-playbook.md` |
-| 4–5 (browser platform) | `references/04-browser-platform-playbook.md` |
-| 2–4 (large games) | `references/07-large-game-streaming.md` |
-| 3–5 (non-Unity / custom engine) | `references/08-native-wasm-port-playbook.md` |
+| 2-3 | `references/02-feasibility-and-approach.md` |
+| 4-5 (Unity) | `references/03-unity-webgl-port-playbook.md` |
+| 4-5 (browser platform) | `references/04-browser-platform-playbook.md` |
+| 2-4 (large games) | `references/07-large-game-streaming.md` |
+| 3-5 (non-Unity / custom engine) | `references/08-native-wasm-port-playbook.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
 
@@ -47,7 +47,7 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 - **Research before building.** A wrong feasibility call wastes days.
 - **Gate every phase with the user.** Ask; wait; then proceed.
 - **Offer options, always with a recommendation.** When more than one approach is
-  viable, present a short menu (2–4 options) with each trade-off, state your
+  viable, present a short menu (2-4 options) with each trade-off, state your
   **best recommendation** and why, then let the user choose. Never present a
   single path as the only one, and never omit your recommendation.
 - **Never commit secrets.** Photon/Steam/API AppIds, passwords, cookie secrets,
@@ -57,7 +57,7 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 - **Know the browser ceiling** before promising anything:
   - No raw UDP/TCP sockets. Networking is WebSocket (TCP) or WebRTC only.
   - WebGL runs on a single (or limited) thread; software rendering (SwiftShader)
-    is slow — always benchmark, never assume.
+    is slow - always benchmark, never assume.
   - Memory ceiling: wasm32 tops out at 4 GB (Unity's default heap is 2 GB);
     wasm64 reaches 16 GB but not on Safari. Anything larger than the working set
     must be **streamed and evicted**, never held resident.
@@ -66,17 +66,17 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 
 ## Presenting a choice
 
-Whenever a phase has real alternatives — the feasibility class, the approach, the
-streamed-install strategy, transport, hosting/auth — do not collapse it to one
+Whenever a phase has real alternatives - the feasibility class, the approach, the
+streamed-install strategy, transport, hosting/auth - do not collapse it to one
 path. Show a short table:
 
 | Option | What it costs | Main risk | When it wins |
 |---|---|---|---|
 
 Then state your **best recommendation** in one line with the reason, and let the
-user pick. Keep it to 2–4 genuinely different options, not every permutation.
+user pick. Keep it to 2-4 genuinely different options, not every permutation.
 
-## Phase 0 — Intake (ask first, build nothing)
+## Phase 0 - Intake (ask first, build nothing)
 
 Ask the user, in one message, and wait for answers:
 
@@ -91,14 +91,14 @@ Ask the user, in one message, and wait for answers:
 
 Only proceed once you can summarise the ask back in three lines.
 
-## Phase 1 — Heavy research (no code)
+## Phase 1 - Heavy research (no code)
 
 Goal: an accurate **Research Dossier** so the feasibility call is evidence-based,
 not guessed. Read `references/01-recon-and-research.md` for exactly where to look.
 
 Identify and record, with the evidence source for each:
 
-- **Engine + version** and **scripting backend** (IL2CPP vs Mono) — this alone
+- **Engine + version** and **scripting backend** (IL2CPP vs Mono) - this alone
   decides most of the pipeline.
 - **Middleware inventory**: networking SDK, voice, audio/video codecs, input,
   analytics, DRM/Steam, anti-cheat, native plugins.
@@ -110,27 +110,27 @@ Identify and record, with the evidence source for each:
 Deliver the dossier, then say what you still cannot determine and how you would
 determine it.
 
-## Phase 2 — Feasibility verdict (gate)
+## Phase 2 - Feasibility verdict (gate)
 
 Read `references/02-feasibility-and-approach.md`. Classify the game and score it:
 
-- **A — Direct port**: source/reconstructed project builds to WebGL almost as-is.
-- **B — Direct port + replacements**: needs substitutes for middleware (e.g. a
+- **A - Direct port**: source/reconstructed project builds to WebGL almost as-is.
+- **B - Direct port + replacements**: needs substitutes for middleware (e.g. a
   different netcode/voice/TTS) and Steam removal.
-- **C — Hybrid**: core runs in WASM; some systems are reimplemented in JS.
-- **D — Rewrite / reimplement**: engine/model incompatible; rebuild the game.
-- **E — Not feasible (cloud streaming only)**: cannot run client-side; only a
+- **C - Hybrid**: core runs in WASM; some systems are reimplemented in JS.
+- **D - Rewrite / reimplement**: engine/model incompatible; rebuild the game.
+- **E - Not feasible (cloud streaming only)**: cannot run client-side; only a
   pixel-streamed remote build is realistic.
 
 For an asset-heavy game, also decide here whether a **streamed install** is
-required — a big game cannot fit in memory and must be chunk-streamed and cached
+required - a big game cannot fit in memory and must be chunk-streamed and cached
 (see `references/07-large-game-streaming.md`).
 
 Give a **go / no-go**, the blockers, and a mitigation for each blocker. For a
 "yes", state the residual risk. If more than one class is defensible, say so and
 lead with your recommendation. Then ask the user to accept or reject the verdict.
 
-## Phase 3 — Approach selection (gate)
+## Phase 3 - Approach selection (gate)
 
 Present the viable methods for *this* game as a short **option table** (approach ·
 what it costs · main risk · when it wins), then state your **best recommendation**
@@ -145,7 +145,7 @@ and why, and let the user choose:
 
 State the chosen approach, why, its cost, and its main failure mode. Ask the user.
 
-## Phase 4 — Execution plan (gate)
+## Phase 4 - Execution plan (gate)
 
 Only after approval. Produce a concrete plan covering, at minimum: build pipeline,
 asset delivery + caching, networking transport, authentication, input, audio/voice,
@@ -161,13 +161,13 @@ Present the plan. If it contains real alternatives (delivery, auth, transport),
 offer them as options with a recommendation too. Then ask whether to start
 executing.
 
-## Phase 5 — Build / test / ship loop
+## Phase 5 - Build / test / ship loop
 
 Run the loop, not one big bang:
 
-1. Build (often **detached**; poll logs — engine builds are slow).
+1. Build (often **detached**; poll logs - engine builds are slow).
 2. Regenerate any deployable page artifact (some engines do **not** regenerate
-   the shipped `index.html` from the template — see the Unity playbook).
+   the shipped `index.html` from the template - see the Unity playbook).
 3. Serve locally and drive the build with an automated browser (headless).
 4. Run single-client and multi-client functional tests.
 5. Deploy to staging/hosted; re-run the same tests hosted.

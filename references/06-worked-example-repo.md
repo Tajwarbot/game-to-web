@@ -1,7 +1,7 @@
 # Worked example: a Unity IL2CPP co-op game → browser
 
 A real port used as a reference for the whole workflow. Names are generic; the
-shape is what matters. Do **not** copy identifiers — a real port carries a billable
+shape is what matters. Do **not** copy identifiers - a real port carries a billable
 AppId and a site password that must never be committed.
 
 ## Shape
@@ -10,7 +10,7 @@ AppId and a site password that must never be committed.
   Voice**; Steam used for auth/invites/TTS.
 - **Reconstruction**: AssetRipper → `ExportedProject/`, scripts filled in until
   it compiled for the agreed scope.
-- **Class**: **B** — direct WebGL port with middleware replacements (Steam →
+- **Class**: **B** - direct WebGL port with middleware replacements (Steam →
   own room-code flow; native TTS → `speechSynthesis`; native voice → Photon Voice
   over WebSocket).
 - **Hosting**: Cloudflare **Worker + R2**, password-form + signed 90-day cookie,
@@ -21,7 +21,7 @@ AppId and a site password that must never be committed.
 
 ## Defects the port hit and fixed (all generalisable)
 
-1. **Lobby late-join + "mic + START GAME" stall — one root cause.** Every level is
+1. **Lobby late-join + "mic + START GAME" stall - one root cause.** Every level is
    the same scene reloaded, so the swap must go through `PhotonNetwork.LoadLevel`
    (pauses the message queue) instead of a bare scene load. Added
    `PauseNetworkQueue()` on room-join + a watchdog.
@@ -42,7 +42,7 @@ AppId and a site password that must never be committed.
 - Local 2-client: host+join+START+leave+re-host+rejoin, both clients
   `players=2`, `pageErrors=0`.
 - Voice: transport connects, both clients join `<room>_voice_`, frames flow
-  (audible still unverified — headless has no audio device).
+  (audible still unverified - headless has no audio device).
 - Hosted: automated 2-client run over the CDN passes; a second load reuses the
   IndexedDB cache (load 2 ≈ 38 s vs ≈ 391 s first load).
 - Worker: form 200, wrong pw 401, right pw 303 + cookie, conditional GET 304.

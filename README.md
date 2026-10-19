@@ -1,44 +1,63 @@
-# webport-game
+# webport
 
-An agent skill for deciding whether a desktop game can run in a browser, and for doing the port if it can.
+A reusable agent skill for porting desktop games to the browser.
 
-Porting a game to the web is a judgement problem before it is a build problem. The engine, the middleware, the network transport and the limits of a browser tab decide more than any build flag does, and most of that has to be settled before code is written. This skill makes an AI coding agent settle it in order, and stop at checkpoints where you decide.
+It works with Claude Code, Codex, opencode and any agent that reads the Agent Skills format. Point it at a game and it researches the build, decides what kind of port is realistic, lays out the options with a recommendation, and only starts work after you approve.
+
+![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f)
+![Works with Claude Code, Codex and opencode](https://img.shields.io/badge/agents-Claude%20Code%20%7C%20Codex%20%7C%20opencode-1f2328)
+
+## The problem
+
+Failed game ports usually die at the first decision, not the last compile. The engine version, the middleware, the network model and the browser's limits decide the outcome long before a build runs. webport makes the agent settle those questions in order, with evidence, and stop for your approval before it spends hours.
 
 ## How it works
 
-The skill is a workflow. It moves the agent through six phases, and at the end of each one the agent reports what it found and waits for your agreement before going further.
+Six phases. Each one ends at a checkpoint where the agent reports what it found and waits.
 
-**Intake.** Work out what you actually have (an installer, a Steam copy, a reconstructed project, or real source) and what has to survive the port: multiplayer, voice, controller input, saves, mods.
+| Phase | What you get |
+| --- | --- |
+| Intake | A clear scope: what you have and what must survive |
+| Recon | A dossier: engine, middleware, assets, native-only systems |
+| Feasibility | A go or no-go with every blocker and a mitigation |
+| Approach | An option table plus a clear recommendation |
+| Plan | Build, delivery, networking, auth, audio, testing, release |
+| Ship | A build, test and deploy loop with the traps written down |
 
-**Reconnaissance.** Identify the engine and scripting backend, then the middleware that decides the job: networking SDK, voice, audio codecs, input, DRM, anti-cheat, native plugins, UI and saves. Each finding cites where it was seen, so the next phase rests on evidence.
+```mermaid
+flowchart LR
+  I[Intake] --> R[Recon]
+  R --> F{Feasible?}
+  F -- no --> S[Stop, or pixel stream]
+  F -- yes --> A[Approach]
+  A --> P[Plan]
+  P --> B[Build and ship]
+```
 
-**Feasibility.** Place the game in one of five classes: direct port, direct port with substitutions, hybrid, rewrite, or not client-side at all. Then give a go or no-go with each blocker and a mitigation. A wrong call here costs the most, so the skill does not skip it.
-
-**Approach.** Present the viable methods as a short option table, give a clear recommendation with its reasoning, and let you choose. The methods are rebuild to WebGL, compile to WebAssembly, wrap an existing build, stream pixels from a server, or reimplement the shell in HTML.
-
-**Plan.** Turn the choice into a concrete plan: build pipeline, asset delivery and caching, networking, authentication, input, audio and voice, saves, testing and release. For a large game the plan includes a streamed install: a small bootstrap, content fetched on demand into an OPFS cache, and eviction when space runs low.
-
-**Build, test, ship.** Work in a loop. Build, regenerate the served page, serve locally, drive it with an automated browser, test with two clients, deploy, and test again hosted. Traps that already cost time are written down so they do not cost it twice.
-
-## Install
+## Quick start
 
 ```bash
-npx skills add Tajwarbot/webport-game
-```
-
-Or copy the folder into an agent that reads the Agent Skills format:
-
-```
-~/.agents/skills/webport-game/
-~/.claude/skills/webport-game/
-.opencode/skills/webport-game/
+npx skills add Tajwarbot/webport
 ```
 
 Then ask:
 
 > Can this game run in a browser? Here is the install folder. Research it and tell me what the port would take.
 
-## Contents
+The agent will not touch code until you accept its feasibility verdict.
+
+## What it knows
+
+The value is in the specifics that real ports take time to learn:
+
+- WebGL has no raw sockets. Networking is WebSocket over TCP or WebRTC, and that choice shows up later as jitter.
+- Photon and PUN on WebGL: the built-in region pinger returns a failure code for every region, the voice client needs a valid Voice AppId, and level loads must pause the message queue or late joiners break.
+- Hosting a large build: honour conditional requests so the browser reuses its IndexedDB copy instead of downloading hundreds of megabytes on every visit.
+- Large games: a streamed install with content-addressed chunks, an OPFS cache, LRU eviction and wasm memory limits.
+- Native games: Emscripten, WASMFS and the same streaming filesystem.
+- Testing: headless browsers, two clients, a fake microphone, and long runs launched detached.
+
+## What's inside
 
 | File | Purpose |
 | --- | --- |
@@ -51,6 +70,7 @@ Then ask:
 | `references/06-worked-example-repo.md` | A completed port used as a reference shape. No identifiers. |
 | `references/07-large-game-streaming.md` | Streamed installs: chunked download, OPFS cache, eviction and wasm memory limits, with a playgta5.net case study. |
 | `references/08-native-wasm-port-playbook.md` | The native path: Emscripten, WASMFS, the streaming filesystem, emulator targets, and the C&C Generals and LEGO Racers case studies. |
+| `examples/example-session.md` | A condensed example of the output at each checkpoint. |
 
 ## Limits
 
@@ -61,3 +81,11 @@ It also assumes you own or are licensed to the game. The skill does not defeat D
 ## Provenance
 
 The checklists, the traps and the playbooks come from a completed port of a co-op game to a live, password gated web build, including the multiplayer, voice and delivery work that made it playable. The worked example contains no real AppIds, endpoints or credentials.
+
+## Contributing
+
+Keep the phases and the checkpoints intact. Add a reference when you have a real lesson, not a guess. Contributions are welcome.
+
+## License
+
+MIT. See `LICENSE`.

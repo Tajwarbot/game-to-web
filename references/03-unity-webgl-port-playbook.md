@@ -10,22 +10,22 @@ the project.
    replace desktop-only code guarded by `#if UNITY_STANDALONE`, `Registry`,
    `Application.Quit`, absolute paths, Steam.
 3. Set the platform to WebGL and build (often a project-specific
-   `*.cmd`/batch file). Engine builds are slow — **run detached and poll logs**.
+   `*.cmd`/batch file). Engine builds are slow - **run detached and poll logs**.
    - Success markers vary; define them up front, e.g. an exit code and a
      `BUILD RESULT: Succeeded errors=0` line. Count real `error CS` lines only
-     after the last licensing/launch line — some engines emit benign lines.
+     after the last licensing/launch line - some engines emit benign lines.
 4. Delete logs before each build so stale errors do not mislead you.
 
 ## 2. The build outputs (what actually ships)
 
-- `Build/<name>.loader.js` — loader.
-- `Build/<name>.framework.js.unityweb` — engine + jslib bridges.
-- `Build/<name>.wasm.unityweb` — IL2CPP code (C# lands here).
-- `Build/<name>.data.unityweb` — assets/resources (usually the huge one).
+- `Build/<name>.loader.js` - loader.
+- `Build/<name>.framework.js.unityweb` - engine + jslib bridges.
+- `Build/<name>.wasm.unityweb` - IL2CPP code (C# lands here).
+- `Build/<name>.data.unityweb` - assets/resources (usually the huge one).
 - An **`index.html`** page + a small `config.js`.
 
 Implication: a **code-only** change (C# or a `.jslib`) usually alters the small
-`wasm`/`framework` files, **not** the multi-hundred-MB `data` file — so players
+`wasm`/`framework` files, **not** the multi-hundred-MB `data` file - so players
 re-download little. Verify by hashing the four files before/after a build.
 
 ## 3. WebGL template & the page gotcha
