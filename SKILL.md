@@ -44,6 +44,9 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | all (sources) | `references/09-sources.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
+| all (end to end) | `RUNBOOK.md` |
+| 0-5 (toolchain) | `references/12-toolchain-setup.md` |
+| 0-5 (toolchain) | `scripts/` |
 
 ## Non-negotiables
 
@@ -79,9 +82,17 @@ path. Show a short table:
 Then state your **best recommendation** in one line with the reason, and let the
 user pick. Keep it to 2-4 genuinely different options, not every permutation.
 
+## Environment and tools
+
+Run the checker before research: `scripts/check-tools.ps1` on Windows or
+`scripts/check-tools.sh` elsewhere. Install whatever is missing with the user's
+consent, following `references/12-toolchain-setup.md`. Record the versions. Do
+not start a build on an unverified toolchain.
+
 ## Phase 0 - Intake (ask first, build nothing)
 
-Ask the user, in one message, and wait for answers:
+First run the toolchain check (see Environment and tools) and install what is
+missing with consent. Then ask the user, in one message, and wait for answers:
 
 1. **What exactly do we have?** Installer, a Steam copy, an already-decompiled
    project, or original source? Which platform/version/build?
@@ -167,7 +178,8 @@ failure it avoids, drawn from `references/05-hard-won-lessons.md` and
 have not researched that workstream enough.
 
 Cover at minimum: build pipeline, asset delivery + caching, networking transport,
-authentication, input, audio/voice, saves, testing harnesses, and release.
+authentication, input, audio/voice, saves, testing harnesses, and release. Add
+the **environment**: exact tool versions and how each was verified.
 Use:
 
 - `references/03-unity-webgl-port-playbook.md` for the Unity build/port mechanics.
@@ -176,6 +188,7 @@ Use:
 - `references/07-large-game-streaming.md` when the assets exceed the memory
   budget: chunked download, an OPFS cache, and eviction.
 - `references/09-sources.md` for official docs behind any claim.
+- `references/12-toolchain-setup.md` for the tools and their verified versions.
 - `references/11-gameplay-parity-and-performance.md` for the **parity matrix**
   and the **performance budgets**, which are part of the plan, not an afterthought.
 

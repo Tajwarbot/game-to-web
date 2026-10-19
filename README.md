@@ -7,6 +7,20 @@ It works with Claude Code, Codex, opencode and any agent that reads the Agent Sk
 ![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f)
 ![Works with Claude Code, Codex and opencode](https://img.shields.io/badge/agents-Claude%20Code%20%7C%20Codex%20%7C%20opencode-1f2328)
 
+## One shot
+
+The repo is built to run end to end in one pass, with checkpoints so it cannot
+quietly go off the rails. Start with the toolchain check, then follow
+`RUNBOOK.md`: tools, intake, recon and mechanics, feasibility, approach, plan,
+build, parity loop, hosting, release.
+
+```powershell
+pwsh -File scripts/check-tools.ps1
+```
+
+The skill stops at each checkpoint and asks before spending hours. That is what
+makes a one-pass port realistic instead of reckless.
+
 ## The problem
 
 Failed game ports usually die at the first decision, not the last compile. The engine version, the middleware, the network model and the browser's limits decide the outcome long before a build runs. G2W makes the agent settle those questions in order, with evidence, and stop for your approval before it spends hours.
@@ -73,6 +87,9 @@ The value is in the specifics that real ports take time to learn:
 | `references/09-sources.md` | Official docs and case studies behind the claims in this skill. |
 | `references/10-plan-template.md` | A fill-in plan, the dead-end pre-mortem, and the definition of done. |
 | `references/11-gameplay-parity-and-performance.md` | The mechanics inventory, parity matrix, verification layers, performance budgets, and the loop with exit criteria. |
+| `references/12-toolchain-setup.md` | Required and optional tools, install commands per OS, and verification. |
+| `RUNBOOK.md` | The end-to-end sequence from toolchain check to release. |
+| `scripts/` | `check-tools.ps1`, `check-tools.sh`, and `setup-windows.ps1`. |
 | `examples/example-session.md` | A condensed example of the output at each checkpoint. |
 
 ## Limits

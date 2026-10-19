@@ -36,6 +36,8 @@ prevents. This is what stops the plan from hitting a wall later.
 - Reference:
 - Known failure:
 - Verification:
+- Tool versions:
+- Checker output:
 
 ### Assets and delivery
 
