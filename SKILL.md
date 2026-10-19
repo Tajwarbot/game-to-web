@@ -38,6 +38,7 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | 4–5 (Unity) | `references/03-unity-webgl-port-playbook.md` |
 | 4–5 (browser platform) | `references/04-browser-platform-playbook.md` |
 | 2–4 (large games) | `references/07-large-game-streaming.md` |
+| 3–5 (non-Unity / custom engine) | `references/08-native-wasm-port-playbook.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
 
@@ -45,6 +46,10 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 
 - **Research before building.** A wrong feasibility call wastes days.
 - **Gate every phase with the user.** Ask; wait; then proceed.
+- **Offer options, always with a recommendation.** When more than one approach is
+  viable, present a short menu (2–4 options) with each trade-off, state your
+  **best recommendation** and why, then let the user choose. Never present a
+  single path as the only one, and never omit your recommendation.
 - **Never commit secrets.** Photon/Steam/API AppIds, passwords, cookie secrets,
   and server source live only in untracked config. Scan before every commit.
 - **Respect law and ToS.** The user must own or be licensed to the game. Do not
@@ -58,6 +63,18 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
     must be **streamed and evicted**, never held resident.
   - No OS APIs: no Steam, no filesystem, no native dialogs, no background threads
     as on desktop.
+
+## Presenting a choice
+
+Whenever a phase has real alternatives — the feasibility class, the approach, the
+streamed-install strategy, transport, hosting/auth — do not collapse it to one
+path. Show a short table:
+
+| Option | What it costs | Main risk | When it wins |
+|---|---|---|---|
+
+Then state your **best recommendation** in one line with the reason, and let the
+user pick. Keep it to 2–4 genuinely different options, not every permutation.
 
 ## Phase 0 — Intake (ask first, build nothing)
 
@@ -110,11 +127,14 @@ required — a big game cannot fit in memory and must be chunk-streamed and cach
 (see `references/07-large-game-streaming.md`).
 
 Give a **go / no-go**, the blockers, and a mitigation for each blocker. For a
-"yes", state the residual risk. Then ask the user to accept or reject the verdict.
+"yes", state the residual risk. If more than one class is defensible, say so and
+lead with your recommendation. Then ask the user to accept or reject the verdict.
 
 ## Phase 3 — Approach selection (gate)
 
-Choose the single best method for *this* game and justify it against the runner-up:
+Present the viable methods for *this* game as a short **option table** (approach ·
+what it costs · main risk · when it wins), then state your **best recommendation**
+and why, and let the user choose:
 
 1. **Unity WebGL export** from a reconstructed project (the usual answer for A/B).
 2. **Native rebuild via Emscripten/WASM** (non-Unity, or Unity native plugins).
@@ -137,7 +157,9 @@ saves, testing harnesses, and release/versioning. Use:
 - `references/07-large-game-streaming.md` when the assets exceed the memory
   budget: chunked download, an OPFS cache, and eviction.
 
-Present the plan, then ask the user whether to start executing.
+Present the plan. If it contains real alternatives (delivery, auth, transport),
+offer them as options with a recommendation too. Then ask whether to start
+executing.
 
 ## Phase 5 — Build / test / ship loop
 

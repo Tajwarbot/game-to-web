@@ -16,7 +16,7 @@ The skill installs a workflow, not a script. It drives the agent through six pha
 
 **Feasibility.** Classify the game — direct port, direct port with substitutions, hybrid, rewrite, or not client-side at all — and produce a go/no-go with a named blocker and a mitigation for each. A wrong call here is the most expensive mistake in the process, so the skill refuses to skip it.
 
-**Approach.** Choose one method and justify it against its closest rival. Rebuild to WebGL, compile to WebAssembly, wrap an existing build, stream pixels from a server, or reimplement the shell in HTML — the right answer depends on this game, not on the last one.
+**Approach.** Lay out every viable method as a short option table — rebuild to WebGL, compile to WebAssembly, wrap an existing build, stream pixels from a server, or reimplement the shell in HTML — then give a clear **best recommendation** with its reasoning, and let you choose. The right answer depends on this game, not the last one, and you always keep the choice.
 
 **Plan.** A concrete execution plan covering the build pipeline, asset delivery and caching, networking, authentication, input, audio and voice, saves, testing, and release. For an asset-heavy game it plans a **streamed install** — a small bootstrap plus chunked, range-fetched content in an OPFS cache with LRU eviction — instead of a full download.
 
@@ -56,6 +56,7 @@ Then ask, in plain language:
 | `references/05-hard-won-lessons.md` | Failures that cost real time on a real port, stated as checks. |
 | `references/06-worked-example-repo.md` | A completed port used as a reference shape. No identifiers. |
 | `references/07-large-game-streaming.md` | Streamed installs: chunked download, OPFS cache, eviction, and wasm memory limits. Includes a playgta5.net case study. |
+| `references/08-native-wasm-port-playbook.md` | The non-Unity path: Emscripten, WASMFS, the streaming filesystem, emulator targets, and the C&C Generals / LEGO Racers case studies. |
 
 ---
 
