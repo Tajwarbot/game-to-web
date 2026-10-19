@@ -106,13 +106,34 @@ prevents. This is what stops the plan from hitting a wall later.
 - Verification:
 - Artifact and version:
 
-## 4. Definition of done
+## 4. Parity matrix and performance budgets
+
+Copy the matrix from `11-gameplay-parity-and-performance.md` and fill it in. Set
+the performance budgets now, before any optimization, so "fast enough" has a
+number.
+
+| Mechanic | Expected behaviour | Verified by | Status | Severity | Notes |
+| --- | --- | --- | --- | --- | --- |
+| | | | | | |
+
+| Budget | Target | Measured | Pass |
+| --- | --- | --- | --- |
+| Time to first gameplay | | | |
+| FPS / p95 frame time | | | |
+| Memory (wasm plus JS) | | | |
+| Network RTT / jitter | | | |
+| Cache size / hit rate | | | |
+
+## 5. Definition of done
 
 A port is finished when every line is true or explicitly marked as an accepted
 gap. Do not call it done because it boots.
 
 - [ ] Builds reproducibly from a clean checkout with a documented command.
 - [ ] Reaches the menu and completes a full single-player loop.
+- [ ] The parity matrix has no blockers, and every high-severity row is verified
+      or an accepted gap with a stated reason.
+- [ ] Performance matches the budgets in section 4.
 - [ ] Two clients can host, join, start, leave, re-host and rejoin.
 - [ ] Voice transport connects, or the gap is stated plainly (headless cannot hear).
 - [ ] Hosted load works, and a second load reuses the cache instead of re-downloading.
@@ -124,7 +145,7 @@ gap. Do not call it done because it boots.
 - [ ] `STATE.md` and `HANDOFF` written for the next agent.
 - [ ] Open items listed honestly, with the reason each is open.
 
-## 5. Open questions
+## 6. Open questions
 
 List what is still unknown and how you will close it. Never hide an unknown
 inside a plan.

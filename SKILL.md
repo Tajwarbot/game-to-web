@@ -40,6 +40,7 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | 2-4 (large games) | `references/07-large-game-streaming.md` |
 | 3-5 (non-Unity / custom engine) | `references/08-native-wasm-port-playbook.md` |
 | 4 (planning) | `references/10-plan-template.md` |
+| 1-5 (parity) | `references/11-gameplay-parity-and-performance.md` |
 | all (sources) | `references/09-sources.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
@@ -108,6 +109,9 @@ Identify and record, with the evidence source for each:
 - **Asset formats** and size; **UI framework** (uGUI/IMGUI/UITK/other).
 - **Save system** (files? registry? cloud?).
 - **What is native-only** and has no browser equivalent.
+- **Gameplay mechanics**: the core loop, every player-visible system, and the
+  observable behaviours that define them. Build the inventory in
+  `references/11-gameplay-parity-and-performance.md`.
 
 Deliver the dossier, then say what you still cannot determine and how you would
 determine it.
@@ -127,6 +131,10 @@ Read `references/02-feasibility-and-approach.md`. Classify the game and score it
 For an asset-heavy game, also decide here whether a **streamed install** is
 required - a big game cannot fit in memory and must be chunk-streamed and cached
 (see `references/07-large-game-streaming.md`).
+
+Also score **mechanics risk**: which systems depend on engine features, frame
+timing, physics or netcode that will change in the browser. Put the fragile ones
+in the blocker list with the test that would catch them.
 
 Give a **go / no-go**, the blockers, and a mitigation for each blocker. For a
 "yes", state the residual risk. If more than one class is defensible, say so and
@@ -168,28 +176,47 @@ Use:
 - `references/07-large-game-streaming.md` when the assets exceed the memory
   budget: chunked download, an OPFS cache, and eviction.
 - `references/09-sources.md` for official docs behind any claim.
+- `references/11-gameplay-parity-and-performance.md` for the **parity matrix**
+  and the **performance budgets**, which are part of the plan, not an afterthought.
 
-Present the plan, including the pre-mortem and the definition of done. If it
+Present the plan, including the pre-mortem, the parity matrix and the definition
+of done. If it
 contains real alternatives (delivery, auth, transport), offer them as options
 with a recommendation too. Then ask whether to start executing.
 
-## Phase 5 - Build / test / ship loop
+## Phase 5 - Parity and performance loop
 
-Run the loop, not one big bang:
+A port is not finished when it boots. It is finished when the mechanics behave
+like the original and the numbers stay within budget. Work the loop in
+`references/11-gameplay-parity-and-performance.md`.
 
-1. Build (often **detached**; poll logs - engine builds are slow).
+Ship mechanics:
+
+1. Build (often **detached**; poll logs - engines build slowly).
 2. Regenerate any deployable page artifact (some engines do **not** regenerate
    the shipped `index.html` from the template - see the Unity playbook).
 3. Serve locally and drive the build with an automated browser (headless).
-4. Run single-client and multi-client functional tests.
-5. Deploy to staging/hosted; re-run the same tests hosted.
-6. Package a release; keep a versioned, reproducible artifact.
-7. Check the work against the **definition of done** in
-   `references/10-plan-template.md` before calling it finished.
+4. Deploy to staging/hosted and re-run the same tests there.
 
-Record every "worked / didn't work" result in a running `STATE.md`, and keep a
-`HANDOFF-*.md` that a successor agent can act on without re-discovering anything.
-See `references/06-worked-example-repo.md` for the format that survived a real port.
+Then loop until the exit criteria hold:
+
+5. Pick the highest-severity **unverified** row in the parity matrix.
+6. Reproduce the same scenario in the original and in the port, same inputs and seed.
+7. Compare behaviour and performance against the row's acceptance criteria.
+8. Fix the smallest cause, then re-run that row and the regression set.
+9. Update the matrix and the performance dashboard.
+10. Repeat.
+
+Exit criteria, all required:
+
+- No blockers remain.
+- Every high-severity mechanic is verified, or is an accepted gap with a reason.
+- Performance is inside the budgets set in the plan.
+- The regression suite is green on the final build.
+- The definition of done in `references/10-plan-template.md` is satisfied.
+
+Record every result in `STATE.md`, and keep a `HANDOFF-*.md` a successor can act
+on without rediscovering anything. See `references/06-worked-example-repo.md`.
 
 ## Ask-the-user checkpoints (do not skip)
 
