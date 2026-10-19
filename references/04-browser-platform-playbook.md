@@ -2,10 +2,13 @@
 
 ## Networking
 
-- **WebGL has no raw sockets.** Transports are **WebSocket (TCP)** and **WebRTC**.
-  TCP-over-WebSocket has head-of-line blocking → jitter; WebRTC removes it. If the
-  SDK supports WebRTC on WebGL, prefer it; otherwise accept TCP and choose regions
-  carefully.
+- **WebGL has no raw sockets.** Transports are **WebSocket (TCP)**, **WebRTC data
+  channels**, and **WebTransport** over HTTP/3. WebSocket has head-of-line
+  blocking and jitter. WebRTC only avoids that when the channel is configured
+  unordered and unreliable (`ordered: false, maxRetransmits: 0`); the default is
+  ordered and reliable. WebTransport gives unreliable datagrams where supported.
+  Prefer the lowest-jitter option the SDK supports, and plan STUN/TURN/relay for
+  WebRTC.
 - **Photon/PUN specifics** (verified on a real port):
   - On WebGL the client uses `WebSocketSecure`; name server is
     `wss://ns.photonengine.io:443/`; the room connects to a game server like
@@ -21,10 +24,11 @@
     (`ReturnCode 32755 Authentication type 'None' not supported`). Resolve the
     Voice id from your Realtime id at runtime, or set it explicitly.
   - **Scene-load stalls / late-join bugs**: when level changes are scene reloads,
-    the swap must go through the engine's networked level load (which pauses the
-    message queue during the load) - a bare scene load bypasses it and breaks
-    RPC replay to late joiners. Pause the queue on room-join with a watchdog that
-    always resumes it.
+    the swap must go through the engine's networked level load, which pauses the
+    message queue during the load. A bare scene load bypasses it and breaks RPC
+    replay to late joiners. The pause-on-join watchdog is one project's patch,
+    not a general rule: verify it with a deadlock test, and prefer a late-join
+    snapshot where the engine supports one.
 - **"Best region"** depends on the same pinger - if it is broken, compute the best
   region yourself and set it explicitly rather than leaving it to auto.
 - One room = one region. A geographically spread group cannot all have good ping;
@@ -44,9 +48,11 @@
 - Uploading a multi-hundred-MB file: a single multipart PUT can drop; use
   chunked multipart with per-part retries.
 - **Auth for a private build**: a password **form** that sets a signed cookie
-  beats a Basic-Auth dialog (which reappears constantly). Keep Basic accepted for
-  sub-resources so automation still works; verify with `curl` (form, wrong pw →
-  401, right pw → cookie, conditional GET → 304).
+  beats a Basic-Auth dialog. Set the cookie `HttpOnly; Secure; SameSite=Lax`,
+  add rate limiting, and make logout revoke it. Do not keep a second auth path
+  (Basic) that bypasses the form. For automation use a test token or signed URL,
+  not a shared password. Verify with `curl` (form, wrong password, cookie,
+  protected sub-resource, conditional GET).
 - **Releases**: package a versioned zip; ship `config.js` **empty**. Publish via
   the host's release mechanism and keep the "Latest" pointer correct.
 
@@ -67,8 +73,11 @@
 
 ## Saves
 
-- No filesystem. Use `IndexedDB`/`localStorage` through the bridge; keep the
-  existing save format and serialise to a string where possible.
+- No filesystem. Use `IndexedDB`/`localStorage` through the bridge.
+- Write atomically: temp key or file, then commit, with a checksum and a schema
+  version. Test a corrupt save and an old save.
+- Provide export/import, and keep saves away from the asset cache (see `07`).
+- Namespace saves per tab or lock them so two tabs do not clobber each other.
 
 ## Testing (automate; do not eyeball)
 
@@ -83,6 +92,11 @@
   runs detached and poll output**; never rely on a short shell timeout.
 - Assert real outcomes (both clients see `players=2`, `pageErrors=0`), not just
   "no crash".
+- Headless on one machine is not a netcode test: clients share origin, GPU and
+  loopback. Run a release test with separate profiles or machines and inject
+  latency and loss (for example `tc netem` or a proxy).
+- SwiftShader is for determinism, not performance. Measure on a real GPU or the
+  number is meaningless.
 
 ## Performance
 

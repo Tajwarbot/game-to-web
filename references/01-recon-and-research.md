@@ -27,12 +27,17 @@ facts. Never guess the engine or middleware.
 
 ## Reconstructing a project (when there is no source)
 
-- **AssetRipper** (or similar) turns a build's assets into a Unity project
-  (`ExportedProject/` with `Assets/`, `ProjectSettings/`). Scripts come back as
-  **stubbed C#** that must be filled in - plan for this.
-- **IL2CPP** builds: recover metadata and structure, then re-express scripts.
-  Expect the logic to be imperfect; the aim is a **compiling** project that
-  behaves like the original for the scope you agreed.
+- **AssetRipper** turns a build's assets into a Unity project (`ExportedProject/`
+  with `Assets/` and `ProjectSettings/`). It does **not** recover IL2CPP logic:
+  scripts come back as stubs.
+- **IL2CPP needs a code-recovery step.** Dump `global-metadata.dat` with
+  Il2CppDumper or Cpp2IL, decompile the IL, and check for obfuscation,
+  encryption and control-flow flattening. Decompile about 20 core methods and
+  judge readability. Coverage decides the class:
+  - readable and bounded: a reconstruction is plausible (class B);
+  - unreadable or unbounded: default to class D (rewrite), not B.
+- **Mono** builds are easier: `Assembly-CSharp.dll` decompiles with a standard
+  .NET decompiler.
 - Keep the reconstruction **separate** from any hand-written port code so it can
   be re-imported when the pipeline changes.
 

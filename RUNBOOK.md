@@ -1,7 +1,8 @@
-# RUNBOOK: one pass from a game to a web build
+# RUNBOOK: end to end, from a game to a web build
 
-This is the end-to-end sequence. Follow it in order. Each step produces an
-artifact and ends at a checkpoint where you stop and ask the user.
+`SKILL.md` is the canonical workflow. This file is a short index of the same
+steps; if the two disagree, follow `SKILL.md`. Each step produces an artifact and
+ends at a checkpoint where you stop and ask the user.
 
 ## 0. Check the toolchain
 
@@ -66,5 +67,5 @@ Walk the definition of done in `references/10-plan-template.md` line by line.
 ## The one rule
 
 If a step cannot name the reference and the failure it prevents, stop and research
-that step before writing code. That is what keeps a one-pass port from hitting a
-dead end at the end.
+that step before writing code. That is how a port avoids hitting a dead end at
+the end.

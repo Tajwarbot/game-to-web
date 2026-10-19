@@ -32,6 +32,7 @@ commands unless you pass `-Yes`).
 | WebGL Build Support module | the build target |
 | IL2CPP | script compilation for the build |
 | AssetRipper | turn a shipped build into a project |
+| Il2CppDumper or Cpp2IL | recover IL2CPP metadata and IL; AssetRipper alone is not enough |
 | .NET SDK (if the project needs it) | script tooling |
 
 Install the editor version that matches the game. A mismatched editor is the most

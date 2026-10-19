@@ -1,0 +1,12 @@
+# Local secrets and generated files. Never commit these.
+config.js
+.env
+.env.*
+*.pem
+*.key
+
+# Local runs
+*.log
+*.out
+node_modules/
+shots/

@@ -3,7 +3,7 @@ name: game-to-web
 description: Research, feasibility-assess, and port a desktop game (Unity or native) to run in a web browser ("webport"). Use when the user wants to bring a game to the browser, asks "can this game run in a browser", mentions WebGL/WebGPU ports, Emscripten, AssetRipper, decompiling a Unity build, Unity WebGL, browser multiplayer (Photon/PUN), or publishing a playable web build. Also use to scope or estimate a webport before committing, and for the ongoing build/test/deploy loop of an existing webport.
 metadata:
   version: "1"
-  purpose: one-shot-to-plan G2W (Game to Web) workflow for any coding agent
+  purpose: end-to-end G2W (Game to Web) workflow for any coding agent
 ---
 
 # G2W: port a desktop game to the browser
@@ -47,10 +47,17 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | all (end to end) | `RUNBOOK.md` |
 | 0-5 (toolchain) | `references/12-toolchain-setup.md` |
 | 0-5 (toolchain) | `scripts/` |
+| all (records) | `templates/` |
 
 ## Non-negotiables
 
 - **Research before building.** A wrong feasibility call wastes days.
+- **Bias to make it work.** A "no" is the last resort. For every blocker, test or
+  document at least two ways to solve it (replace, rewrite, wrap, stream,
+  emulate) before calling it impossible.
+- **State uncertainty plainly.** If research leaves you unsure, say so, with your
+  confidence and the cheap test that would settle it. Never present an untested
+  blocker as a definite failure.
 - **Gate every phase with the user.** Ask; wait; then proceed.
 - **Offer options, always with a recommendation.** When more than one approach is
   viable, present a short menu (2-4 options) with each trade-off, state your
@@ -61,12 +68,15 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 - **Respect law and ToS.** The user must own or be licensed to the game. Do not
   redistribute proprietary assets, and do not defeat DRM. State this explicitly.
 - **Know the browser ceiling** before promising anything:
-  - No raw UDP/TCP sockets. Networking is WebSocket (TCP) or WebRTC only.
+  - No raw UDP/TCP sockets. Networking is WebSocket (TCP), WebRTC data channels
+    (ordered by default), or WebTransport over HTTP/3.
   - WebGL runs on a single (or limited) thread; software rendering (SwiftShader)
     is slow - always benchmark, never assume.
-  - Memory ceiling: wasm32 tops out at 4 GB (Unity's default heap is 2 GB);
-    wasm64 reaches 16 GB but not on Safari. Anything larger than the working set
-    must be **streamed and evicted**, never held resident.
+  - Memory ceiling is version-specific. wasm32 tops out at 4 GB, but Unity's
+    maximum depends on the editor version and the practical tab budget is much
+    lower because JS, GPU and network memory sit outside the heap. wasm64 can
+    reach 16 GB on Chrome and Firefox, not Safari. Measure, do not assume.
+    Anything larger than the working set must be **streamed and evicted**.
   - No OS APIs: no Steam, no filesystem, no native dialogs, no background threads
     as on desktop.
 
@@ -84,10 +94,14 @@ user pick. Keep it to 2-4 genuinely different options, not every permutation.
 
 ## Environment and tools
 
-Run the checker before research: `scripts/check-tools.ps1` on Windows or
-`scripts/check-tools.sh` elsewhere. Install whatever is missing with the user's
-consent, following `references/12-toolchain-setup.md`. Record the versions. Do
-not start a build on an unverified toolchain.
+All paths in this skill are relative to its own directory. Run the checker before
+research: `scripts/check-tools.ps1` on Windows or `scripts/check-tools.sh`
+elsewhere. Install whatever is missing with the user's consent, following
+`references/12-toolchain-setup.md`. Record the versions. Do not start a build on
+an unverified toolchain.
+
+Use `scripts/scan-secrets.ps1` before every commit. Copy `templates/STATE.md` and
+`templates/HANDOFF-NEXT.md` into the port's working folder at the start.
 
 ## Phase 0 - Intake (ask first, build nothing)
 
@@ -125,7 +139,9 @@ Identify and record, with the evidence source for each:
   `references/11-gameplay-parity-and-performance.md`.
 
 Deliver the dossier, then say what you still cannot determine and how you would
-determine it.
+determine it. The dossier is complete when every row cites a source, every
+unknown has a named cheap test, and the code-recovery check (see `01`) has a
+verdict. Do not drift into open-ended research.
 
 ## Phase 2 - Feasibility verdict (gate)
 
@@ -147,9 +163,19 @@ Also score **mechanics risk**: which systems depend on engine features, frame
 timing, physics or netcode that will change in the browser. Put the fragile ones
 in the blocker list with the test that would catch them.
 
-Give a **go / no-go**, the blockers, and a mitigation for each blocker. For a
-"yes", state the residual risk. If more than one class is defensible, say so and
-lead with your recommendation. Then ask the user to accept or reject the verdict.
+**Three verdicts, not two.** Choose one and state your confidence.
+
+- **Go**: the evidence supports a direct or staged port.
+- **Uncertain (provisional)**: research is incomplete, or a blocker is untested.
+  Say so plainly, give the confidence, name the test that would settle it, and
+  run that test before planning. Never dress an untested blocker up as a no-go.
+- **No-go**: only after the alternatives are exhausted. List the paths you tried
+  and why each failed, and offer the closest viable alternative (pixel streaming,
+  partial port, emulation, user-supplied assets) instead of a bare refusal.
+
+A blocker is not a verdict until it has been tested or documented as a dead end.
+For every blocker, name at least two possible solutions before giving up on it.
+Then ask the user to accept or reject the verdict.
 
 ## Phase 3 - Approach selection (gate)
 
@@ -192,6 +218,10 @@ Use:
 - `references/11-gameplay-parity-and-performance.md` for the **parity matrix**
   and the **performance budgets**, which are part of the plan, not an afterthought.
 
+The plan must start with a **vertical slice**: one level, one core mechanic, one
+netcode path, and one target device. If the slice fails or is out of budget, stop
+before full production.
+
 Present the plan, including the pre-mortem, the parity matrix and the definition
 of done. If it
 contains real alternatives (delivery, auth, transport), offer them as options
@@ -228,8 +258,8 @@ Exit criteria, all required:
 - The regression suite is green on the final build.
 - The definition of done in `references/10-plan-template.md` is satisfied.
 
-Record every result in `STATE.md`, and keep a `HANDOFF-*.md` a successor can act
-on without rediscovering anything. See `references/06-worked-example-repo.md`.
+Record every result in `STATE.md`, and keep a `HANDOFF-NEXT.md` a successor can
+act on without rediscovering anything. See `references/06-worked-example-repo.md`.
 
 ## Ask-the-user checkpoints (do not skip)
 

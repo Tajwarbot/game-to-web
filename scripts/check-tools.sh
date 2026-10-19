@@ -7,13 +7,13 @@ missing_required=()
 missing_optional=()
 
 check() {
-  name="$1"; shift
-  required="$2"; shift
-  if command -v "$1" >/dev/null 2>&1; then
-    v=$("$@" 2>&1 | head -n 1)
+  name="$1"; required="$2"; shift 2
+  exe="$1"; shift
+  if command -v "$exe" >/dev/null 2>&1 || [ -x "$exe" ]; then
+    v=$("$exe" "$@" 2>&1 | head -n 1)
     printf '%-10s %-9s %s\n' "$name" "ok" "$v"
   else
-    printf '%-10s %-9s %s\n' "$name" "MISSING" "not on PATH"
+    printf '%-10s %-9s %s\n' "$name" "MISSING" "not found"
     if [ "$required" = "yes" ]; then missing_required+=("$name"); else missing_optional+=("$name"); fi
   fi
 }
@@ -23,11 +23,22 @@ check git    yes git --version
 check node   yes node -v
 check npm    yes npm -v
 check python yes python3 --version
-check chrome yes google-chrome --version
+
+# Chrome is not on PATH on macOS.
+CHROME_MAC="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+if command -v google-chrome >/dev/null 2>&1; then
+  check chrome yes google-chrome --version
+elif [ -x "$CHROME_MAC" ]; then
+  check chrome yes "$CHROME_MAC" --version
+else
+  check chrome yes google-chrome --version
+fi
+
 check 7z     no  7z
 check ffmpeg no  ffmpeg -version
 check cmake  no  cmake --version
 check emcc   no  emcc --version
+check unity  no  unity --version
 
 echo
 if [ ${#missing_required[@]} -gt 0 ]; then

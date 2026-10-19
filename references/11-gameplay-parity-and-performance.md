@@ -59,12 +59,17 @@ Use more than one. Each catches what the others miss.
 - A manual feel pass for timing, weight and input response, which automation
   cannot judge.
 
+Record each row's verification type: automated headless, automated real GPU, or
+manual device. Two headless clients on one machine share the origin, GPU and
+loopback, so they do not test network conditions or feel.
+
 ## 4. Performance budgets (set before optimizing)
 
 Put real numbers in the plan, then measure against them:
 
 - time to menu and time to first gameplay
 - FPS and p95 frame time in a representative scene
+- first-run shader compilation and stutter, measured in a cold profile
 - memory: wasm heap plus JS, and growth over a session
 - network: RTT, jitter, and message rate where measurable
 - cache: size and hit rate for a streamed install

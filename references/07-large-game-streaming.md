@@ -33,7 +33,8 @@ dies well before that.
 3. **Chunks fetched by HTTP Range** into a persistent store (OPFS), verified,
    then read back on demand.
 4. **LRU eviction** under a budget, with the current level's chunks pinned.
-5. **Saves and settings in a separate store** that survives cache eviction.
+5. **Saves and settings exported or synced off-origin**, because eviction removes
+   every store in the origin.
 
 ### Storage tiers
 
@@ -43,23 +44,24 @@ dies well before that.
 | Runtime | Cache Storage or OPFS | 20-100 MB | bootstrap `.wasm`, engine modules |
 | Hot game data | **OPFS** | seconds-GBs | chunked textures, meshes, audio, level data |
 | Metadata | **IndexedDB** | a few MB | manifest, chunk index, LRU table, completion bitmap |
-| Saves/settings | separate IndexedDB / Storage Bucket, `persist()` | small | must survive cache eviction |
+| Saves/settings | IndexedDB, exported or synced off-origin | small | eviction removes same-origin stores, so back them up |
 
-**OPFS is the only browser store suitable for a multi-GB random-access game
-cache.** `createSyncAccessHandle()` (dedicated workers only) gives synchronous
-positioned `read(buffer, {at})` / `write` - the primitive a WASM virtual
-filesystem needs. IndexedDB has no partial/streaming reads, so keep bytes in
-OPFS and only the index in IndexedDB. Cache Storage has no partial reads either;
-use it for the shell, not the asset cache. The File System Access API is
-Chromium-only and gesture-gated - only for optional "export/install to disk".
+**For a native/WASM runtime, OPFS is the best multi-GB random-access cache.**
+`createSyncAccessHandle()` (dedicated workers only) gives synchronous positioned
+`read(buffer, {at})` / `write`, which is the primitive a WASM virtual filesystem
+needs. IndexedDB can store Blobs and slice them, but it has no synchronous
+positioned access and is a poor fit for a hot asset cache. Cache Storage has no
+partial reads. The File System Access API is Chromium-only and gesture-gated.
+Unity cannot mount OPFS; see the engine-specific section below.
 
 ## Chunk protocol rules
 
 - **Content-address chunks** by `sha256`, immutable names → caches dedupe and
   survive version changes.
-- **4-8 MB compressed chunks** are a good default (range-requested). Cite range:
-  playgta5 uses byte ranges with a ~580 MB boot set; Generals uses 64 MB
-  segments; LEGO Racers 512 KiB lazy files.
+- **Chunk size is a tuning result, not a rule.** 4-8 MB is a common starting
+  point, but real ports range from 512 KiB to 64 MB (LEGO Racers to Generals).
+  Derive it from measured RTT, throughput and asset access patterns, and test
+  cancellation on teleport and level change.
 - **Compress each chunk independently.** Never whole-file `gzip` if you need
   byte ranges - offsets then refer to compressed bytes and random access breaks.
   (In practice gzip/deflate in `DecompressionStream` is portable; Brotli is not
@@ -82,23 +84,28 @@ Chromium-only and gesture-gated - only for optional "export/install to disk".
   protection from auto-eviction (it does **not** raise quota; Chrome decides
   silently, Firefox prompts). `persisted()` checks it.
 - **Eviction is all-or-nothing per origin** - when an origin is evicted, OPFS,
-  IndexedDB and Cache Storage go together. **Never keep saves in the same
-  disposable store as the cache.**
+  IndexedDB and Cache Storage go together, so a "separate" IndexedDB does not
+  save the player's data. Export saves, sync them to a server, or host them on
+  another origin.
 - Handle `QuotaExceededError` (check `err.name`): evict the oldest unpinned
   ~10%, re-read `estimate()`, retry once; if it still fails, drop to
   streaming-only and warn the player.
 - **Evict** at ~80% of the cache budget: keep `lastAccess/size/pinned/buildId`
-  in IndexedDB, pin the current level, prefetch a ring around the player, and
-  delete the previous `buildId` directory after an update.
-- **Multi-tab:** OPFS sync handles are exclusive by default. Elect a
-  single downloader/evictor with the **Web Locks API**; other tabs read.
-  Service workers cannot use sync handles.
+  in IndexedDB, pin the current level, and prefetch a ring around the player.
+  Keep the previous `buildId` for rollback and switch the manifest pointer in two
+  phases; do not delete a build another tab may still be using.
+- **Multi-tab:** OPFS sync handles are exclusive, and an async `getFile()` while
+  another tab appends can return stale or short data. Keep chunks immutable,
+  elect one downloader with the **Web Locks API**, and let other tabs read
+  snapshots. Service workers cannot use sync handles.
 
 ## Why streaming is mandatory (memory numbers)
 
-- **wasm32:** 4 GiB max linear memory (Unity's default heap is 2 GB).
-- **wasm64 / memory64:** 16 GiB top (Chrome/Edge 133+/Firefox 134+; **no
-  Safari**), ~10-100% slower.
+- **wasm32:** 4 GiB hard ceiling. Unity's initial and maximum heap are
+  version-specific and usually far below it.
+- **wasm64 / memory64:** 16 GiB top on Chrome and Firefox, no Safari, and slower.
+  Unity support depends on the editor version.
+- Measure the real tab budget: JS, GPU and network memory sit outside the heap.
 - The Unity heap is one contiguous buffer; growth is one-way and can fail.
   Textures also live in GPU memory. So only the working set can be resident.
 - There is **no `mmap`** for WASM. Emulate demand paging: fixed-size pages, an
@@ -106,15 +113,19 @@ Chromium-only and gesture-gated - only for optional "export/install to disk".
 
 ## Engine-specific
 
-**Unity.** `.data` downloads **whole** unless you (a) move content into
-**Addressables remote groups** or (b) enable **Progressive Asset Loading**
-(Unity 6.6+) to split `.data` per scene. AssetBundles must be **LZ4** (no LZMA on
-Web) and the whole bundle is held in memory when loaded, so pack **2-10 MB per
-bundle** by zone/chapter and release promptly. There is **no OPFS zero-copy**:
-assets always land in the heap. `Caching` is unsupported on Web and
-`GetDownloadSizeAsync` does **not** reflect the browser cache - don't preflight
-with it. So for Unity, large-game streaming = Addressables zone bundles +
-wasm64 for headroom; the OPFS block-cache pattern needs a custom JS layer.
+**Unity.** `.data` downloads **whole** unless you move content into
+**Addressables remote groups** or enable **Progressive Asset Loading** (a Unity 6
+feature; verify the exact version before relying on it, and note it is
+incompatible with exact-version reconstruction on older editors). AssetBundles
+must be **LZ4** (no LZMA on Web) and the whole bundle is held in memory when
+loaded, so pack **2-10 MB per bundle** by zone/chapter and release promptly.
+There is **no OPFS zero-copy**: assets always land in the heap. `Caching` is
+unsupported on Web and `GetDownloadSizeAsync` does **not** reflect the browser
+cache. Unity's automatic IndexedDB bundle cache grows across levels and builds
+and has no eviction API, so manage it from JS or ship a clear-cache control.
+Do not assume wasm64 on older editors. For Unity, large-game streaming is
+Addressables zone bundles plus careful cache management; the OPFS block-cache
+pattern needs a custom JS layer.
 
 **Custom Emscripten/C++ (or other engines with a filesystem hook).** Implement a
 **WASMFS fetch backend** (HTTP-Range reads; Emscripten default 16 MiB chunks) and
@@ -143,11 +154,12 @@ Verified from the site's own served files:
   removed).
 - **~3 GB** of local cache; **no eviction** (append-only, reset only on a new
   build). The full mirror is ~21 GB, so the cache is a small on-demand subset.
-- Roughly **~700 MB** instead of a ~170 GB install.
+- Published figures put it at roughly **~700 MB** instead of a ~170 GB install.
+  Treat every size here as **observed on one build**, not as a planning target.
 - **Caveat:** this build derives from leaked engine source. Cite it as a
   *technique* reference only. It is not a licence model - the assets are
-  proprietary and must not be redistributed. Engine source ≠ right to ship
-  assets.
+  proprietary and must not be redistributed. Engine source is not a right to
+  ship assets.
 
 ## Feasibility questions (feed into Phase 2)
 

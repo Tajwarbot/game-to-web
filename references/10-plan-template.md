@@ -131,20 +131,24 @@ number.
 A port is finished when every line is true or explicitly marked as an accepted
 gap. Do not call it done because it boots.
 
-- [ ] Builds reproducibly from a clean checkout with a documented command.
+- [ ] Builds from a clean checkout with a documented command, and the artifact
+      hash is recorded. Inputs are pinned; do not claim bit-identical builds.
 - [ ] Reaches the menu and completes a full single-player loop.
+- [ ] Every level, mode, item and progression path in scope is present and verified.
 - [ ] The parity matrix has no blockers, and every high-severity row is verified
       or an accepted gap with a stated reason.
-- [ ] Performance matches the budgets in section 4.
+- [ ] Performance matches the budgets in section 4, measured on a real GPU.
+- [ ] A late joiner receives the full world state after several minutes of play.
 - [ ] Two clients can host, join, start, leave, re-host and rejoin.
-- [ ] Voice transport connects, or the gap is stated plainly (headless cannot hear).
+- [ ] Master-client departure is handled, or explicitly marked unsupported.
+- [ ] Voice is audible, or the exact gap is stated (headless cannot hear).
 - [ ] Hosted load works, and a second load reuses the cache instead of re-downloading.
-- [ ] Auth works: form, wrong password, cookie, and protected sub-resources.
-- [ ] No secrets in the repository; the AppId lives only in the served config.
-- [ ] Performance measured on a real GPU, not only software rendering.
-- [ ] Mobile tested, or explicitly out of scope.
+- [ ] A quota-fill or cleared-site-data run recovers, and saves can be exported.
+- [ ] Auth works: form, wrong password, cookie flags, logout, and protected sub-resources.
+- [ ] No secrets in the repository; the AppId is public, and abuse is limited server-side.
+- [ ] Tested on the agreed browser and device matrix; mobile is tested or out of scope.
 - [ ] Release artifact versioned and reproducible.
-- [ ] `STATE.md` and `HANDOFF` written for the next agent.
+- [ ] `STATE.md` and `HANDOFF-NEXT.md` written for the next agent.
 - [ ] Open items listed honestly, with the reason each is open.
 
 ## 6. Open questions
