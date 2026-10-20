@@ -42,7 +42,11 @@ performance budgets. Get approval to start.
 1. Build detached and poll the logs.
 2. Regenerate the served page if the engine does not.
 3. Serve locally with a threaded server for multi-client tests.
-4. Drive the build with a headless browser.
+4. Drive the build with a headless browser. Give every harness the shared launcher in
+   [`scripts/profile-hygiene/profile.js`](scripts/profile-hygiene/profile.js): throwaway profiles are
+   deleted after `browser.close()`, persistent ones are reused, and a sweep clears stale `%TEMP%`
+   profiles. A per-run `userDataDir` that only gets `browser.close()` leaks ~0.5 GB per run for a
+   WebGL build (seen: 55 GB in four days).
 
 ## 6. Parity and performance loop
 
