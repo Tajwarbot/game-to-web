@@ -76,6 +76,7 @@ The value is in the specifics that real ports take time to learn:
 | `references/10-plan-template.md` | A fill-in plan, the dead-end pre-mortem, and the definition of done. |
 | `references/11-gameplay-parity-and-performance.md` | The mechanics inventory, parity matrix, verification layers, performance budgets, and the loop with exit criteria. |
 | `references/12-toolchain-setup.md` | Required and optional tools, install commands per OS, and verification. |
+| `references/13-multiplayer-and-voice.md` | Authority, transport, regions, late join, Photon/Voice specifics, the test matrix, and a symptom to fix table. |
 | `RUNBOOK.md` | The end-to-end sequence from toolchain check to release. |
 | `scripts/` | `check-tools.ps1`, `check-tools.sh`, `setup-windows.ps1`, and `scan-secrets.ps1`. |
 | `templates/` | `STATE.md` and `HANDOFF-NEXT.md` starters. |

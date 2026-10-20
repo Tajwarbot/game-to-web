@@ -41,6 +41,7 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | 3-5 (non-Unity / custom engine) | `references/08-native-wasm-port-playbook.md` |
 | 4 (planning) | `references/10-plan-template.md` |
 | 1-5 (parity) | `references/11-gameplay-parity-and-performance.md` |
+| 2-5 (multiplayer) | `references/13-multiplayer-and-voice.md` |
 | all (sources) | `references/09-sources.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
@@ -215,6 +216,8 @@ Use:
   budget: chunked download, an OPFS cache, and eviction.
 - `references/09-sources.md` for official docs behind any claim.
 - `references/12-toolchain-setup.md` for the tools and their verified versions.
+- `references/13-multiplayer-and-voice.md` for authority, transport, region,
+  late join, voice and the multiplayer test matrix.
 - `references/11-gameplay-parity-and-performance.md` for the **parity matrix**
   and the **performance budgets**, which are part of the plan, not an afterthought.
 

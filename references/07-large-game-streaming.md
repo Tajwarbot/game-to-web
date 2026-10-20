@@ -9,6 +9,31 @@ tight memory budget.
 This is the pattern behind browser GTA V (`playgta5.net`), the C&C Generals
 WASM port, LEGO Racers, and emulator disk streaming - see the case study below.
 
+## Should you stream this build?
+
+Streaming is not the default. **Caching is not streaming.** Reusing a cached copy
+(IndexedDB plus `304`) fixes repeat visits and costs almost nothing. On-demand
+delivery adds a manifest, a chunk service, eviction and new failure modes, so it
+has to earn its place.
+
+| Build size | Default decision |
+| --- | --- |
+| under about 500 MB | do not stream. Cache correctly and measure the first load. |
+| about 0.5 to 2 GB | ship a small boot set first. Move to Addressables zone bundles only if time to first play is too slow. |
+| over about 2 GB | Addressables (or an equivalent) is required. Add a custom engine with OPFS only if you need demand paging. |
+| tens of GB | not stock Unity. A custom WASM engine plus OPFS, or pixel streaming. |
+
+Two limits decide most cases:
+
+- **Unity cannot page from OPFS.** Assets are copied into the WASM heap, so
+  "streaming" in Unity means smaller downloads and unloading, not memory-mapped
+  paging.
+- **The browser cache is not yours to evict in Unity.** Unity's IndexedDB bundle
+  cache has no eviction API, so plan to manage or clear it from JS.
+
+If the game is a few hundred MB, loads once and then caches, and the real
+complaint is re-downloading, fix the cache path before adding a streaming layer.
+
 ## The four budgets - keep them separate
 
 | Budget | Meaning | Typical ceiling |

@@ -19,6 +19,16 @@ AppId and a site password that must never be committed.
 - **Testing**: puppeteer-core + SwiftShader; a threaded local server on one port
   for 2-client runs; a fake-mic mode; long runs launched detached and polled.
 
+## Why this port did not stream
+
+The build is about 445 MB: one `.data` archive plus a 14 MB `.wasm`. Unity
+downloads `.data` whole, and the whole game fits comfortably in IndexedDB. The
+real complaint was re-downloading on every visit, which the `304` fix solved.
+Moving assets to Addressables would have meant refactoring the reconstruction for
+a few minutes of first-load time, so it was not done. If this build grew past
+about 1-2 GB, the next step would be Addressables zone bundles, not an OPFS
+engine, because stock Unity cannot page from OPFS.
+
 ## Defects the port hit and fixed (all generalisable)
 
 1. **Lobby late-join + "mic + START GAME" stall - one root cause.** Every level is

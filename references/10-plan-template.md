@@ -54,6 +54,11 @@ prevents. This is what stops the plan from hitting a wall later.
 - Reference:
 - Known failure:
 - Verification:
+- Authority model:
+- Transport and region choice:
+- Late-join and level-change strategy:
+- Master migration and reconnect:
+- Voice AppId and audio check:
 
 ### Auth and hosting
 

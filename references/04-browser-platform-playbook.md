@@ -2,6 +2,9 @@
 
 ## Networking
 
+For the full netcode and voice treatment, see
+`13-multiplayer-and-voice.md`. The short version:
+
 - **WebGL has no raw sockets.** Transports are **WebSocket (TCP)**, **WebRTC data
   channels**, and **WebTransport** over HTTP/3. WebSocket has head-of-line
   blocking and jitter. WebRTC only avoids that when the channel is configured
