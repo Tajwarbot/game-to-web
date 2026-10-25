@@ -45,6 +45,7 @@ Detail lives in `references/` (read the relevant one when you reach that phase):
 | all (sources) | `references/09-sources.md` |
 | all | `references/05-hard-won-lessons.md` |
 | worked example | `references/06-worked-example-repo.md` |
+| latest real session | `sessions/2026-10-25-repo-webport.md` |
 | all (end to end) | `RUNBOOK.md` |
 | 0-5 (toolchain) | `references/12-toolchain-setup.md` |
 | 0-5 (toolchain) | `scripts/` |
